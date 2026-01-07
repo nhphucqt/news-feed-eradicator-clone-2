@@ -179,13 +179,17 @@ const handleMessage = async (msg: ToServiceWorkerMessage, sender: MessageSender)
 		const site = siteList.sites.find(site => site.hosts.includes(url.host));
 
 		if (site != null) {
+			console.log('Found site config for host', url.host, 'siteId', site.id);
 			const siteOptions = await loadRegionsForSite(site.id);
 
 			let regions = site.regions
 				.map((region): DesiredRegionState => {
 					if (isSnoozing || (region.paths !== '*' && !isEnabledPath(site, msg.path))) {
+						console.log('Disabling region due to snooze or path mismatch', region.id);
 						return { config: region, css: null, enabled: false };
 					}
+
+					console.log('Enabling region', region.id);
 
 					const enabled = siteOptions.regionEnabledOverride[region.id] ?? region.default ?? true;
 
@@ -207,6 +211,8 @@ const handleMessage = async (msg: ToServiceWorkerMessage, sender: MessageSender)
 					id: theme,
 				}
 			})
+		} else {
+			console.log('No site config for host', url.host);
 		}
 	}
 
