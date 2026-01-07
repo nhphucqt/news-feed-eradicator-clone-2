@@ -5,12 +5,14 @@ import { reddit } from "./reddit";
 import { substack } from "./substack";
 import { twitter } from "./twitter";
 import { youtube } from "./youtube";
+import { facebook } from "./facebook";
 
 const sitelist: SiteList = {
 	schemaVersion: 1,
 	sites: [
 		reddit,
 		youtube,
+		facebook,
 		twitter,
 		hackernews,
 		substack,

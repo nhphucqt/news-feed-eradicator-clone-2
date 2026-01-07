@@ -47,9 +47,60 @@ const notifyTabsOptionsUpdated = async () => {
 	}
 }
 
-const isEnabledPath = (site: Site, path: string): boolean | undefined => {
-	return site.paths.includes(path);
-}
+const stripAfter = (s: string, ch: string) => {
+	const i = s.indexOf(ch);
+	return i === -1 ? s : s.slice(0, i);
+};
+
+const normalizePath = (p: string) => {
+	if (!p) return "/";
+
+	// ensure leading slash
+	let x = p.startsWith("/") ? p : `/${p}`;
+
+	// strip hash + query (no array indexing => no TS2532)
+	x = stripAfter(stripAfter(x, "#"), "?");
+
+	// collapse multiple slashes
+	x = x.replace(/\/{2,}/g, "/");
+
+	// remove trailing slash (except root)
+	if (x.length > 1) x = x.replace(/\/+$/g, "");
+
+	return x;
+};
+
+const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+const globToRegExp = (() => {
+	const cache = new Map<string, RegExp>();
+
+	return (glob: string) => {
+		const g = normalizePath(glob);
+		const cached = cache.get(g);
+		if (cached) return cached;
+
+		// Escape everything, then re-enable glob tokens.
+		// Use a placeholder so ** doesn't get partially converted by * rule.
+		let re = "^" + escapeRegExp(g) + "$";
+		re = re.replace(/\\\*\\\*/g, "__DOUBLE_STAR__");
+		re = re.replace(/\\\*/g, "[^/]*");
+		re = re.replace(/__DOUBLE_STAR__/g, ".*");
+		re = re.replace(/\\\?/g, "[^/]");
+
+		const rx = new RegExp(re);
+		cache.set(g, rx);
+		return rx;
+	};
+})();
+
+export const isEnabledPath = (site: Site, path: string): boolean => {
+	const normalizedPath = normalizePath(path);
+	console.log("isEnabledPath", site.id, normalizedPath, site.paths);
+	const res = site.paths.some((p) => globToRegExp(p).test(normalizedPath));
+	console.log("isEnabledPath result:", res);
+	return res;
+};
 
 const cssForType = (type: Region['type']): string => {
 	switch (type) {

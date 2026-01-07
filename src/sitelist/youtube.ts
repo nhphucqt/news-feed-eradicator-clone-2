@@ -4,18 +4,18 @@ export const youtube: Site = {
 			id: siteId('youtube'),
 			title: 'YouTube',
 			hosts: ['www.youtube.com', 'youtube.com'],
-			paths: ['/', '/gaming', '/podcasts'],
+			paths: ['/', '/gaming**', '/podcasts**', '/shorts**'],
 			regions: [
 				{
 					id: regionId('feed'),
 					title: 'Main feed',
 					selectors: ['ytd-browse'],
 					paths: 'inherit',
-					type: 'hide',
-					inject: {
-						mode: 'overlay-fixed',
-						overlayZIndex: 2019,
-					},
+					type: 'remove',
+					// inject: {
+					// 	mode: 'overlay-fixed',
+					// 	overlayZIndex: 2019,
+					// },
 				},
 				{
 					id: regionId('shorts-button'),
@@ -23,6 +23,13 @@ export const youtube: Site = {
 					type: 'remove',
 					paths: '*',
 					selectors: ['ytd-guide-entry-renderer:has(a[title="Shorts"])', 'ytd-mini-guide-entry-renderer:has(a[title="Shorts"])'],
+				},
+				{
+					id: regionId('youtube-shorts'),
+					title: 'Youtube Shorts',
+					type: 'remove',
+					paths: '*',
+					selectors: ['ytd-shorts'],
 				},
 				{
 					id: regionId('explore-nav'),
