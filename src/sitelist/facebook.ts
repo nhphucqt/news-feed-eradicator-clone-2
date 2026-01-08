@@ -3,7 +3,7 @@ import { type Site, siteId, regionId } from "../types/sitelist";
 export const facebook: Site = {
     id: siteId('facebook'),
     title: 'Facebook',
-    hosts: ['web.facebook.com', 'facebook.com'],
+    hosts: ['www.facebook.com', 'web.facebook.com', 'facebook.com'],
     paths: ['/', '/watch**', '/marketplace**', '/gaming**', '/reel**'],
     regions: [
         {
